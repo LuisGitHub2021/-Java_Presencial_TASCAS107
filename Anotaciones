@@ -1,0 +1,220 @@
+Anotaciones
+
+Informan al compilador; detectar errores o suprimir advertencias
+Procesamiento en tiempo de compilacion e implementacion; para generar codifo, archivos XML , etc
+Procesamiento en tiempo de ejecucion; para ser examinadas en tiempo de ejecucion
+
+Donde y como aplicarlas
+Anotaciones de tipo junto con sistemas de tipos conextables para escribir
+con mayor seguridad verificacion de tipos y como implemnetar anotaciones
+repetidas.
+
+CONCEPTOS BASICOS
+@XXXXXX
+
+@Override
+void mySuperMethod() { ... }
+
+La anotación puede incluir elementos, pueden tener nombre o no y valores
+@Author(
+   name = "Benjamin Franklin",
+   date = "3/27/2003"
+)
+class MyClass { ... }
+or
+SI SOLO HAY UN ELEMENTO VALUE, ENTONCES SE PUEDE OMITIR EL NOMBRE
+@SuppressWarnings(value = "unchecked")
+void myMethod() { ... }
+
+SI LA ANOTACION NO TIENE ELEMENTOS  ENTONCES SE PUEDE OMITIR LOS PARENTESIS
+@Override 
+void mySuperMethod() { ... }
+
+SE PUEDE UTILIZAR VARIAS ANOTACIONES
+@Author(name = "Jane Doe")
+@EBook
+class MyClass { ... }
+SI SON DEL MISMO TIPO SE DENOMINAN REPETIDAS, SON COMPATIBLES DESDE JAVA SE 8
+@Author(name = "Jane Doe")
+@Author(name = "John Smith")
+class MyClass { ... }
+
+Los tipos anotaciones estan en java.lang o java.lang.annotations
+ANOTACIONES PREDEFINIDAS como @Override y @SuppressWarningd
+Se pueden personalizar @Author y @Ebook del ejemplo lo son
+
+DONDE SE PUEDEN UTILIZAR
+1. EN DECLARACIONES DE CLASES
+2. CAMPOS
+3. METODOS
+
+En una declaracion cada anotación  suele aparecer en su propia linea
+
+A PARTIR DE JAVA SE 8 LAS ANOTACIONES TAMBIEN SE PUEDEN APLICAR AL USO DE TIPOS
+ESTA FORMA DE ANOTACION SE LLAMA ANOTACION DE TIPO
+EJEMPLO 
+CREACION INSTANCIA DE CLASE
+new @Interned MyObject();
+
+TYPE CAST
+myString = (@NonNull String) str;
+
+IMPLEMENTS CLAUSE
+class UnmodifiableList<T> implements
+        @Readonly List<@Readonly T> { ... }
+
+THROWN EXCEPTION DECLARATION
+ void monitorTemperature() throws
+        @Critical TemperatureException { ... }
+        
+
+DECLARAR UN TIPO DE ANOTACION
+Muchas anotaciones reemplazan comentarios
+Un  grupo de Software comienza tradicionalmente así
+ // Autor: John Doe
+   // Fecha: 17/03/2002
+   // Revisión actual: 6
+   // Última modificación: 12/04/2004
+   // Por: Jane Doe
+   // Revisores: Alice, Bill, Cindy
+
+   // el código de clase va aquí
+Estos mismos metadatos con anotacion sería
+1. DEFINIR tipo de anotacion
+@interface ClassPreamble {
+   String author();
+   String date();
+   int currentRevision() default 1;
+   String lastModified() default "N/A";
+   String lastModifiedBy() default "N/A";
+   // Note use of array
+   String[] reviewers();
+}
+
+ES SIMILAR a una definicon de interface donde la palbra clave interface viene precedida port @
+Las anotaciones son un tipo de interface
+TENGA EN CUENTA QUE PUEDEN DEFINIR VALORES PREDETERMINADOS OPCIONALES
+UNA VEZ DEFINIDA EL TIPO DE ANTOACION PUEDE UTILIZAR ANOTACIONES DE ESTE TIPO
+@ClassPreamble (
+   author = "John Doe",
+   date = "3/17/2002",
+   currentRevision = 6,
+   lastModified = "4/12/2004",
+   lastModifiedBy = "Jane Doe",
+   // Note array notation
+   reviewers = {"Alice", "Bob", "Cindy"}
+)
+public class Generation3List extends Generation2List {
+
+// class code goes here
+
+}
+Para que la información @ClassPreambleaparezca en la documentación generada
+por Javadoc, debe anotar la @ClassPreambledefinición 
+con la @Documentedanotación:
+// import this to use @Documented
+import java.lang.annotation.*;
+
+@Documented
+@interface ClassPreamble {
+
+   // Annotation element definitions
+   
+}
+
+TIPO DE ANOTACIONES PREDEFINIDAS
+Los tipos de anotaciones predefinidos definidos en java.lang son
+ @Deprecated, @Overridey @SuppressWarnings
+ 
+ @Deprecated
+ Indicca que el elemento marcado está en desuso y ya no debe usarse
+ El compilador genera la advertencia cada vez que un program usa METODO, CLASE o CAMPO
+
+CUANDO UN ELEMENTO QUEDA OBSOLETA TAMBIEN DEBE DOCUMENTARSE
+@deprecated etiqueta Javadoc
+El signo de  tanto en los comentario Javadoc como en las anotaciones no es una coincidencia,
+estan relacionados. La etiqueta Javadoc comineza en minuscula  y la anotacion en mayuscula
+EJEMPLO
+ // Sigue el comentario de Javadoc 
+    /** 
+     * @deprecated 
+     * explicación de por qué quedó obsoleto 
+     */ @Deprecated 
+    static void deprecatedMethod() { } 
+}
+
+@Override
+Indica al compilador qie el elemento está destinado a anular un elemento decalarado en una superclase.
+Los metodos de anulacion se analizarán en interfaces y herencia
+// marcar el método como método de superclase 
+   // que ha sido anulado 
+   @Override  
+   int overriddenMethod() { }
+   Si bien no es necesario utilizarla al anular un metodo ayuda a evitar errores
+   SI un metodo marcado no lo anula correctamente un metodo en superclase el compilador genera error
+   
+   @SuppressWarnings
+   Le dice al compilador que suprima advertencias específicas 
+   EN el siguienet ejemplo se utiliza metodo absoluto y el compiladpr genera advertencia
+   Con  la anotacion se suprime
+   
+   // usar un metodo absoluto y decirle 
+   // al compilador que no genere una advertencia
+      @SuppressWarnings("deprecation")
+    void useDeprecatedMethod() {
+        // deprecation warning
+        // - suppressed
+        objectOne.deprecatedMethod();
+    }
+   
+   Cada advertencia del compilador pertenece a una categoria
+   La especificacion del lenguaja Java enumera dos categorias
+   deprecation y unchecked
+   La unchecked puede ocurrir al actuar con codigo heredado escrito antes de la lllegada de los genericos
+
+EJEMPLO
+Para suprimir varias categorias de advertencias
+@SuppressWarnings({"unchecked", "deprecation"})
+
+@SafeVarargs
+Cuando se aplica al metodo o al constructor
+AFRIMA QUE EL CODIGO NO REALIZA OPERCIONES POTENCIALMENTE INSEGURAS
+EN SU VARARGS PARAMETRO VARARGS
+Cuando se utiliza este tipo de anotacion 
+se suprimen las advertencias no marcasdas relacionadas con el uso
+
+@Functionallinterface
+Introducida en Java SE 8 indica que la declaracion de Tipo esta destinada
+a ser una interface funcional
+
+ANOTACIONES QUE SE APLICA A OTRAS ANOTACIONES
+Se denomina metaanotaciones meta-annotations.
+Varios tipos
+@Retention. ESPECIFICA COMO SE ALMACEN ALA ANOTACION
+@RetentionPolicy.SOURCE SE CONSERVA UNICAMENTE EN El NIVEL DE ORIGEN
+@RetentionPolicy.CLASS EL COMPILADOR CONSERVA LA ANOTACION EN COMPILACION PERO JVM IGNORA
+@RetentionPolicy.RUNTIME LA JVM CONSERVA LA ANOTACION PARA QUE PUEDA SER UTILIZADA EN ENTRONO DE EJECUCION
+
+@DOCUMENTED. Ç
+SIEMPRE QUE SE UTILICE ESOS ELEMENTOS DEBEN DOCUMENTARSE UTILIZANDO JAVADOC
+DE FORMA PREDETERMINADA LAS ANOTACIONES NO SE INCLUYEN EN JAVADOC
+
+@TARGET
+MARCA OTRA ANOTACION PARA RESTRINGIR A QUE TIPO DE ELEMENTOS JAVA SE PUEDE APLICAR LA ANOTACION
+
+ElementType.ANNOTATION_TYPEse puede aplicar a un tipo de anotación.
+ElementType.CONSTRUCTORse puede aplicar a un constructor.
+ElementType.FIELDse puede aplicar a un campo o propiedad.
+ElementType.LOCAL_VARIABLEse puede aplicar a una variable local.
+ElementType.METHODse puede aplicar a una anotación a nivel de método.
+ElementType.PACKAGEse puede aplicar a una declaración de paquete.
+ElementType.PARAMETERse puede aplicar a los parámetros de un método.
+ElementType.TYPESe puede aplicar a cualquier elemento de una clase.
+
+
+@Inherited
+INDICA QUE EL TIPO DE ANOTACION SE PUEDE HEREDAR DE LA SUPERCLASE
+SE APLICA SOLO A LAS DECLARACIONES DE CLASE
+
+@REPEATABLE
+INIDICA QIE SE PUEDE APLICAR MAS DE UNA VEZ A LA MISMA DECLARACION I USO DE TIPO
